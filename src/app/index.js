@@ -7,6 +7,8 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const booksRouter = require("./routers/book");
+const authRouter = require("./routers/auth");
+
 const app = express();
 const session = require("express-session");
 // Middleware
@@ -37,6 +39,7 @@ function isAuthenticated(req, res, next) {
   }
 }
 app.use("/book", booksRouter);
+app.use("/auth", authRouter);
 
 // Connect to MongoDB
 mongoose
@@ -51,19 +54,4 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
-// Routes
-app.post("/signup", (req, res) => {
-  const { username, password } = req.body;
-  User.register(new User({ username }), password, (err, user) => {
-    if (err) {
-      return res.status(400).json({ message: "Error creating user" });
-    }
-    res.status(200).json({ message: "User created successfully" });
-  });
-});
-
-app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.status(200).json({ message: "Login successful" });
-});
-
-module.exports = { app, isAuthenticated };
+module.exports = { app };

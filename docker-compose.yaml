@@ -5,8 +5,6 @@ services:
     container_name: mongodb
     environment:
       - MONGO_INITDB_DATABASE=digital-paani
-    ports:
-      - 27017:27017  
     volumes:
       - ./data:/data/db
 

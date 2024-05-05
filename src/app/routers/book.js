@@ -1,14 +1,14 @@
+const express = require("express");
+const Book = require("../models/Book");
+const router = express.Router();
+
 function isAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   } else {
     return res.status(401).json({ message: "Unauthorized" });
   }
-} // routes/books.js
-const express = require("express");
-const Book = require("../models/Book");
-const router = express.Router();
-
+}
 // Create a new book entry
 router.post("/", isAuthenticated, async (req, res) => {
   try {
@@ -96,6 +96,7 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 router.get("/:id", async (req, res) => {
   try {
     const bookId = req.params.id;

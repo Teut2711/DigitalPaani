@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "faker": "^6.6.6",
     "mongodb": "^6.6.0",
     "mongoose": "^8.3.3",
     "passport": "^0.7.0",
