@@ -6,22 +6,41 @@ const LocalStrategy = require("passport-local").Strategy;
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const User = require("./models/User");
-
+const booksRouter = require("./routers/book");
 const app = express();
-
+const session = require("express-session");
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(
+  session({
+    secret: "your-secret-key", // Change this to a more secure value
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// Initialize Passport
 app.use(passport.initialize());
+app.use(passport.session());
 
 // Passport local strategy for user login
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+}
+app.use("/book", booksRouter);
+
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect(process.env.DATABASE_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -47,8 +66,4 @@ app.post("/login", passport.authenticate("local"), (req, res) => {
   res.status(200).json({ message: "Login successful" });
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+module.exports = { app, isAuthenticated };

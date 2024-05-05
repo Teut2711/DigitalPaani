@@ -1,17 +1,24 @@
-# docker-compose.yml
-
-version: '3'
+version: '3.8'
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mongo
+  mongodb:
+    image: mongo
+    container_name: mongodb
     environment:
-      - MONGO_URI=mongodb://mongo:27017/myapp
-
-  mongo:
-    image: mongo:latest
+      - MONGO_INITDB_DATABASE=digital-paani
     ports:
-      - "27017:27017"
+      - 27017:27017  
+    volumes:
+      - ./data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - 3000:3000  
+    environment:
+      - PORT=3000
+      - DATABASE_URI=mongodb://mongodb:27017/digital-paani  
+    depends_on:
+      - mongodb  
