@@ -90,8 +90,35 @@ router.get("/", async (req, res) => {
       query.publicationYear = req.query.publicationYear;
     }
 
-    const books = await Book.find(query);
-    res.json(books);
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1; // default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 10; // default to 10 items per page
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+
+    // Count total documents matching the query
+    results.totalCount = await Book.countDocuments(query);
+
+    // Add pagination info to results
+    if (endIndex < results.totalCount) {
+      results.next = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+
+    results.books = await Book.find(query).limit(limit).skip(startIndex).exec();
+    res.json(results);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

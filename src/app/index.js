@@ -31,13 +31,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-function isAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  } else {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-}
 app.use("/book", booksRouter);
 app.use("/auth", authRouter);
 
